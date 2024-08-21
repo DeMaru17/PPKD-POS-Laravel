@@ -21,3 +21,9 @@ Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
 
 //user Route
 Route::resource('user', \App\Http\Controllers\UserController::class);
+
+// category route
+Route::resource('category', \App\Http\Controllers\CategoryController::class);
+
+// product route
+Route::resource('product', \App\Http\Controllers\ProductController::class);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -14,7 +15,7 @@ class UserController extends Controller
     {
         // select * from user
         // $users = User::all();
-        $users = User::orderBy('id','desc')->get();
+        $users = User::orderBy('id', 'desc')->get();
         // compact digunakan untuk melempar view variabel users
         return view('user.index', compact('users'));
     }
@@ -24,7 +25,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('user.create');
     }
 
     /**
@@ -32,7 +33,12 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
+        return redirect()->to('user')->with('message', 'Data berhasil disimpan');
     }
 
     /**
@@ -48,7 +54,8 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $edit = User::findOrFail($id);
+        return view('user.edit', compact('edit'));
     }
 
     /**
@@ -56,7 +63,13 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user =  User::find($id);
+        User::where('id', $id)->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => ($request->password ? Hash::make($request->password) : $user->password)
+        ]);
+        return redirect()->to('user')->with('message', 'Data berhasil diupdate');
     }
 
     /**
@@ -64,6 +77,7 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        User::where('id', $id)->delete();
+        return redirect()->to('user')->with('message', 'Data berhasil dihapus');
     }
 }
