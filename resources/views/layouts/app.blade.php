@@ -43,6 +43,8 @@
 
     <!-- Main content -->
     <section class="content">
+        @include('sweetalert::alert')
+
 
       <!-- Default box -->
       <div class="card">
@@ -98,6 +100,9 @@
 <!-- AdminLTE for demo purposes -->
 <script src="{{asset('adm/dist/js/demo.js')}}"></script>
 
+@include('sweetalert::alert', ['cdn' => "https://cdn.jsdelivr.net/npm/sweetalert2@9"])
+
+
 <script>
     $('#category_id').change(function(){
         let category_id = $(this).val(),
@@ -126,7 +131,6 @@
             success: function(data){
                 $('#product_name').val(data.product_name);
                 $('#product_price').val(data.product_price)
-                console.log(data);
             }
         })
     })
@@ -152,14 +156,15 @@
 
         let newRow = "";
         newRow += "<tr>";
-            newRow += "<td>"+ product_name +"</td>";
+            newRow += "<td>"+ product_name +"<input type='hidden' name='product_id[]' value='"+ product_id +"' ></td>";
             newRow += "<td>"+ product_price.toLocaleString('id-ID')  +"</td>";
-            newRow += "<td>"+ product_qty +"</td>";
-            newRow += "<td>"+ subTotal.toLocaleString('id-ID') +" <input type='hidden' class='sub_total_val' value='"+ subTotal +"'></td>";
+            newRow += "<td>"+ product_qty +"<input type='hidden' name='qty[]' value='"+ product_qty +"' ></td>";
+            newRow += "<td>"+ subTotal.toLocaleString('id-ID') +" <input type='hidden' name='sub_total[]' class='sub_total_val' value='"+ subTotal +"'></td>";
             newRow += "<td></td>";
         newRow += "</tr>"
 
         $('tbody').append(newRow);
+        calculateChange();
 
         let total = 0;
         $('.sub_total_val').each(function(){
@@ -167,8 +172,22 @@
             total += subTotal;
         });
         $('.total_price').text(total.toLocaleString('id-ID'));
+        $('#total_price_val').val(total);
 
     })
+
+    function calculateChange(){
+        let total = parseFloat($('#total_price_val').val()) || 0;
+        let dibayar = parseFloat($('#dibayar').val()) || 0;
+        let kembali = dibayar - total;
+        $('#kembalian').val(kembali);
+        $('.kembalian_text').text(kembali.toLocaleString('id-ID'));
+
+    }
+
+    $('#dibayar').on('change', function(){
+        calculateChange()
+    });
 </script>
 </body>
 </html>

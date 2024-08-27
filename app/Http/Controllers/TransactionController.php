@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Sales;
+use App\Models\SalesDetail;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class TransactionController extends Controller
 {
@@ -14,8 +17,11 @@ class TransactionController extends Controller
     public function index()
     {
         $categories = Category::get();
-        
-        return view('penjualan.index', compact('categories'));
+        $id_transaksi = Sales::max('id');
+        $id_transaksi++;
+        $kode_transaksi = "SL" . date("dmY") . sprintf("%03s", $id_transaksi);
+
+        return view('penjualan.index', compact('categories', 'kode_transaksi'));
     }
 
     /**
@@ -31,7 +37,26 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $dateFormat = date('Y-m-d');
+        $sales = Sales::create([
+            // kolom database => $request->nama_input
+            'trans_code' => $request->kode_transaksi,
+            'trans_date' => $dateFormat,
+            'trans_paid' => $request->dibayar,
+            'trans_change' => $request->kembalian,
+            'trans_total_price' => $request->total_price,
+        ]);
+
+        foreach ($request->product_id as $key => $product) {
+            SalesDetail::create([
+                'sales_id' => $sales->id,
+                'product_id' => $request->product_id[$key],
+                'qty' => $request->qty[$key],
+                'sub_total' => $request->sub_total[$key]
+            ]);
+        }
+        toast('Data berhasil disimpan', 'success');
+        return redirect()->to('print')->with('message', 'Data Berhasil Disimpan');
     }
 
     /**
@@ -66,13 +91,20 @@ class TransactionController extends Controller
         //
     }
 
-    public function getProducts($category_id){
+    public function getProducts($category_id)
+    {
         $products = Product::where('category_id', $category_id)->get();
         return response()->json($products);
     }
 
-    public function productName($product_id){
+    public function productName($product_id)
+    {
         $product = Product::findOrFail($product_id);
         return response()->json($product);
+    }
+
+    public function print(){
+        return view('penjualan.print');
+
     }
 }
