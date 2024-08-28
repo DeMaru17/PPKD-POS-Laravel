@@ -38,4 +38,4 @@ Route::get('get-products/{category_id}',  [\App\Http\Controllers\TransactionCont
 Route::get('get-product-name/{product_id}',  [\App\Http\Controllers\TransactionController::class, 'productName']);
 
 // penjualan print route
-Route::get('print',  [\App\Http\Controllers\TransactionController::class, 'print'] );
+Route::get('print/{id}',  [\App\Http\Controllers\TransactionController::class, 'print'] );

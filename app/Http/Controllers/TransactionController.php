@@ -56,7 +56,7 @@ class TransactionController extends Controller
             ]);
         }
         toast('Data berhasil disimpan', 'success');
-        return redirect()->to('print')->with('message', 'Data Berhasil Disimpan');
+        return redirect()->to('print/' . $sales->id)->with('message', 'Data Berhasil Disimpan');
     }
 
     /**
@@ -103,8 +103,12 @@ class TransactionController extends Controller
         return response()->json($product);
     }
 
-    public function print(){
-        return view('penjualan.print');
+    public function print($id_sales)
+    {
+        $sales = Sales::where('id', $id_sales)->first();
+        $detail_sales = SalesDetail::with('product')->where('sales_id', $id_sales)->get();
 
+
+        return view('penjualan.print', compact('sales', 'detail_sales'));
     }
 }
